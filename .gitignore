@@ -25,6 +25,8 @@ test_run*.log
 graph_database/output/
 graph_database/cache/
 graph_database/logs/
+graph_database/.env
+graph_database/settings.yaml.bak
 
 # OS files
 .DS_Store
