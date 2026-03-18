@@ -27,6 +27,11 @@ graph_database/cache/
 graph_database/logs/
 graph_database/.env
 graph_database/settings.yaml.bak
+graph_database/input/
+
+# External source tree and local reference files
+graphrag-main/
+NeurIPS-2024-g-retriever-retrieval-augmented-generation-for-textual-graph-understanding-and-question-answering-Paper-Conference.pdf
 
 # OS files
 .DS_Store

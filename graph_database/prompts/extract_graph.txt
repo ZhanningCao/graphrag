@@ -1,0 +1,108 @@
+
+-Goal-
+Given a text document that is potentially relevant to this activity and a list of entity types, identify all entities of those types from the text and all relationships among the identified entities.
+
+-Steps-
+1. Identify all entities. For each identified entity, extract the following information:
+- entity_name: Name of the entity, capitalized
+- entity_type: One of the following types: [robot_programming_instruction, robot_axis, welding_process_parameter, error_code, communication_protocol, software_configuration, mathematical_function, robot_component, maintenance_procedure, industrial_robot_model, control_system_variable, other]
+- entity_description: Comprehensive description of the entity's attributes and activities
+Format each entity as ("entity"{tuple_delimiter}<entity_name>{tuple_delimiter}<entity_type>{tuple_delimiter}<entity_description>)
+
+2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are *clearly related* to each other.
+For each pair of related entities, extract the following information:
+- source_entity: name of the source entity, as identified in step 1
+- target_entity: name of the target entity, as identified in step 1
+- relationship_description: explanation as to why you think the source entity and the target entity are related to each other
+- relationship_strength: an integer score between 1 to 10, indicating strength of the relationship between the source entity and target entity
+Format each relationship as ("relationship"{tuple_delimiter}<source_entity>{tuple_delimiter}<target_entity>{tuple_delimiter}<relationship_description>{tuple_delimiter}<relationship_strength>)
+
+3. Return output in Chinese as a single list of all the entities and relationships identified in steps 1 and 2. Use **{record_delimiter}** as the list delimiter.
+
+4. If you have to translate into Chinese, just translate the descriptions, nothing else!
+
+5. When finished, output {completion_delimiter}.
+
+######################
+-Examples-
+######################
+Example 1:
+
+entity_types: [industrial_robot, welding_process, power_source, control_cabinet, positioner, robot_cell, digital_output, error_message, sensor_system]
+text:
+QIROX QRH-410 是一款专为电弧焊接设计的六轴工业机器人，配套 QIROX 控制柜和 QINEO NexT 数字化焊接电源，可构成高效柔性焊接工作站。
+该系统可选配单轴或双轴变位机，用于翻转和旋转大型箱型工件，从而实现多角度焊接。
+电弧传感器用于监控焊接过程中的电弧稳定性，一旦检测到电弧异常，将通过数字输出 DO12 触发错误报警信号。
+错误信息会显示在操作界面上，提醒操作人员检查焊枪、工件装夹或焊接参数设置。
+######################
+output:
+("entity"{tuple_delimiter}QIROX QRH-410{tuple_delimiter}industrial_robot{tuple_delimiter}QIROX QRH-410 是一款专为电弧焊接设计的六轴工业机器人，可与 QIROX 控制柜和 QINEO NexT 数字化焊接电源配套使用，组成高效柔性焊接工作站，用于焊接大型箱型工件等)
+{record_delimiter}
+("entity"{tuple_delimiter}QINEO NexT 焊接电源{tuple_delimiter}power_source{tuple_delimiter}QINEO NexT 是一款数字化焊接电源，为 QIROX QRH-410 焊接机器人提供焊接电流和工艺控制，支持多种电弧焊接模式)
+{record_delimiter}
+("entity"{tuple_delimiter}QIROX 控制柜{tuple_delimiter}control_cabinet{tuple_delimiter}QIROX 控制柜用于控制 QIROX QRH-410 机器人运动和焊接程序执行，并与焊接电源、变位机和数字 I/O 信号互联){record_delimiter}
+("entity"{tuple_delimiter}单轴/双轴变位机{tuple_delimiter}positioner{tuple_delimiter}单轴或双轴变位机作为外部轴集成在焊接工作站中，用于翻转和旋转大型箱型工件，从而实现多角度焊接)
+{record_delimiter}
+("entity"{tuple_delimiter}柔性焊接工作站{tuple_delimiter}robot_cell{tuple_delimiter}由 QIROX QRH-410 机器人、QIROX 控制柜、QINEO NexT 焊接电源和单轴/双轴变位机构成的柔性焊接工作站，用于高效焊接大型工件){record_delimiter}
+("entity"{tuple_delimiter}电弧传感器{tuple_delimiter}sensor_system{tuple_delimiter}电弧传感器用于监控焊接过程中的电弧稳定性，当电弧异常时触发相应的错误报警信号)
+{record_delimiter}
+("entity"{tuple_delimiter}数字输出 DO12{tuple_delimiter}digital_output{tuple_delimiter}数字输出 DO12 用于在检测到电弧异常时输出错误报警信号，通常连接到上位 PLC 或报警系统)
+{record_delimiter}
+("entity"{tuple_delimiter}电弧异常错误{tuple_delimiter}error_message{tuple_delimiter}电弧异常错误是一类焊接过程错误，当电弧不稳定或中断时被检测并通过错误信息和数字输出信号进行报警)
+{record_delimiter}
+("relationship"{tuple_delimiter}QIROX QRH-410{tuple_delimiter}QIROX 控制柜{tuple_delimiter}QIROX 控制柜负责控制 QIROX QRH-410 机器人的运动和焊接程序执行，是该机器人系统中的核心控制单元{tuple_delimiter}10)
+{record_delimiter}
+("relationship"{tuple_delimiter}QIROX QRH-410{tuple_delimiter}QINEO NexT 焊接电源{tuple_delimiter}QIROX QRH-410 与 QINEO NexT 数字化焊接电源配套使用，由电源提供焊接电流和工艺控制，以实现稳定的电弧焊接{tuple_delimiter}9)
+{record_delimiter}
+("relationship"{tuple_delimiter}柔性焊接工作站{tuple_delimiter}QIROX QRH-410{tuple_delimiter}柔性焊接工作站由 QIROX QRH-410 机器人构成核心执行单元，负责具体焊接动作{tuple_delimiter}9)
+{record_delimiter}
+("relationship"{tuple_delimiter}柔性焊接工作站{tuple_delimiter}单轴/双轴变位机{tuple_delimiter}柔性焊接工作站集成单轴或双轴变位机，用于翻转和旋转大型箱型工件，以配合机器人进行多角度焊接{tuple_delimiter}8)
+{record_delimiter}
+("relationship"{tuple_delimiter}电弧传感器{tuple_delimiter}电弧异常错误{tuple_delimiter}电弧传感器监控焊接过程中的电弧状态，当检测到电弧异常时触发电弧异常错误{tuple_delimiter}10)
+{record_delimiter}
+("relationship"{tuple_delimiter}电弧传感器{tuple_delimiter}数字输出 DO12{tuple_delimiter}电弧传感器在检测到电弧异常时通过数字输出 DO12 输出错误报警信号，用于通知上位系统{tuple_delimiter}9)
+{completion_delimiter}
+
+#############################
+
+Example 2:
+
+entity_types: [industrial_robot, external_axis, welding_process, welding_parameter, safety_protocol, user_interface]
+text:
+本系统配备 QIROX QRH-410 焊接机器人以及一套单轴外部轴，用于实现大型工件的翻转焊接。
+焊接控制程序中可以选择多种焊接工艺，如脉冲焊和短路过渡，并可设置电流、电压和焊接速度等参数。
+操作界面提供“安全操作模式”，在该模式下，机器人以降低的速度运行，并要求操作人员通过安全确认按键进行操作，确保示教与调试过程中的人身安全。
+
+######################
+output:
+("entity"{tuple_delimiter}QIROX QRH-410{tuple_delimiter}industrial_robot{tuple_delimiter}QIROX QRH-410 焊接机器人是本系统的主要执行机构，用于对大型工件进行电弧焊接)
+{record_delimiter}
+("entity"{tuple_delimiter}单轴外部轴{tuple_delimiter}external_axis{tuple_delimiter}单轴外部轴用于翻转大型工件，使机器人能够从不同角度进行焊接)
+{record_delimiter}
+("entity"{tuple_delimiter}脉冲焊工艺{tuple_delimiter}welding_process{tuple_delimiter}脉冲焊是一种焊接工艺模式，可通过程序在焊接控制中选择，用于特定材料和焊接质量要求)
+{record_delimiter}
+("entity"{tuple_delimiter}短路过渡工艺{tuple_delimiter}welding_process{tuple_delimiter}短路过渡是一种焊接工艺模式，适用于薄板和特定工况的焊接)
+{record_delimiter}
+("entity"{tuple_delimiter}焊接电流、电压、速度参数{tuple_delimiter}welding_parameter{tuple_delimiter}焊接电流、电压和焊接速度等参数在焊接程序中可调，用于控制焊接热输入和成形质量)
+{record_delimiter}
+("entity"{tuple_delimiter}安全操作模式{tuple_delimiter}safety_protocol{tuple_delimiter}安全操作模式是一种安全运行模式，在该模式下机器人以降低速度运行，并要求操作人员通过安全确认按键操作，以保障示教与调试过程的人身安全)
+{record_delimiter}
+("entity"{tuple_delimiter}操作界面{tuple_delimiter}user_interface{tuple_delimiter}操作界面为用户提供焊接工艺选择、参数设置和安全模式切换等功能)
+{record_delimiter}
+("relationship"{tuple_delimiter}QIROX QRH-410{tuple_delimiter}单轴外部轴{tuple_delimiter}QIROX QRH-410 焊接机器人与单轴外部轴配合使用，通过翻转工件实现多角度焊接{tuple_delimiter}9)
+{record_delimiter}
+("relationship"{tuple_delimiter}焊接电流、电压、速度参数{tuple_delimiter}脉冲焊工艺{tuple_delimiter}焊接电流、电压和速度等参数用于配置脉冲焊工艺，以满足特定焊接质量要求{tuple_delimiter}7)
+{record_delimiter}
+("relationship"{tuple_delimiter}焊接电流、电压、速度参数{tuple_delimiter}短路过渡工艺{tuple_delimiter}焊接电流、电压和速度等参数同样用于配置短路过渡工艺，以适应不同工况{tuple_delimiter}7)
+{record_delimiter}
+("relationship"{tuple_delimiter}安全操作模式{tuple_delimiter}操作界面{tuple_delimiter}安全操作模式通过操作界面进行启用和配置，操作界面提供安全模式的切换和确认功能{tuple_delimiter}8)
+{completion_delimiter}
+
+
+######################
+-Real Data-
+######################
+entity_types: [robot_programming_instruction, robot_axis, welding_process_parameter, error_code, communication_protocol, software_configuration, mathematical_function, robot_component, maintenance_procedure, industrial_robot_model, control_system_variable, other]
+text: {input_text}
+######################
+output:
