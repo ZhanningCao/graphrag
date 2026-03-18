@@ -1,0 +1,181 @@
+### 已迁移至 graphrag v3.0.5 配置格式
+### 原始配置已备份为 settings.yaml.bak
+### For a full list of available settings, see https://microsoft.github.io/graphrag/config/yaml/
+
+### LLM settings ###
+## completion_models 和 embedding_models 分开定义（v3.0.5 新格式）
+## auth_type → auth_method，model_id → completion_model_id / embedding_model_id
+
+completion_models:
+  default_completion_model:
+    model_provider: openai
+    model: qwen3:1.7b                    # Ollama 中的模型名：qwen3-1.7B
+    api_base: http://localhost:11434/v1   # 指向本地 Ollama 的 OpenAI 兼容接口
+    auth_method: api_key
+    api_key: Ollama
+    call_args:
+      temperature: 0.0
+      top_p: 1.0
+      timeout: 120
+    retry:
+      type: exponential_backoff
+      max_retries: 2                      # v3.0.5 要求 > 1
+
+embedding_models:
+  default_embedding_model:
+    model_provider: openai
+    model: qwen3-embedding:4b             # Ollama embedding 模型名
+    api_base: http://localhost:11434/v1
+    auth_method: api_key
+    api_key: Ollama
+    retry:
+      type: exponential_backoff
+      max_retries: 3
+
+## 全局并发 & 异步模式（v3.0.5 移至顶层）
+concurrent_requests: 1
+async_mode: threaded
+
+### Input settings ###
+## input 与 input_storage 分开（v3.0.5 新格式）
+
+input:
+  type: json                              # [csv, text, json, jsonl]
+  text_column: text                       # 正文来自 block.text
+  title_column: id                        # 用 block.id 当标题
+
+input_storage:
+  type: file
+  base_dir: "input"
+
+### Chunking settings ###
+## chunks → chunking；prepend_metadata 直接给字段列表（v3.0.5 新格式）
+
+chunking:
+  type: tokens
+  size: 1200
+  overlap: 80
+  prepend_metadata: [doc_id, heading_path]
+
+### Storage settings ###
+## output → output_storage；cache 结构变更（v3.0.5 新格式）
+
+output_storage:
+  type: file
+  base_dir: "output"
+
+cache:
+  type: json
+  storage:
+    type: file
+    base_dir: "cache"
+
+reporting:
+  type: file
+  base_dir: "logs"
+
+vector_store:
+  type: lancedb
+  db_uri: "d:\\SEU\\SRTP项目\\graphrag\\graph_database\\output\\lancedb"
+  vector_size: 2560
+  index_schema:
+    text_unit_text:
+      index_name: "default-text_unit-text"
+      vector_size: 2560
+      fields:
+        text: str
+        attributes: str
+    entity_description:
+      index_name: "default-entity-description"
+      vector_size: 2560
+      fields:
+        text: str
+        attributes: str
+
+### Workflow settings ###
+## 如需运行完整管线，注释掉 workflows 即可（默认自动编排全部步骤）
+workflows:
+  - "generate_text_embeddings"
+
+### Workflow configurations ###
+
+embed_text:
+  embedding_model_id: default_embedding_model
+  batch_size: 10
+  names:
+    - text_unit_text                      # 旧版 text_unit.text → text_unit_text
+    - entity_description                  # 旧版 entity.description → entity_description
+
+extract_graph:
+  completion_model_id: default_completion_model
+  prompt: "prompts/extract_graph.txt"
+  entity_types: [robot_programming_instruction, robot_axis, welding_process_parameter, error_code, communication_protocol, software_configuration, mathematical_function, robot_component, maintenance_procedure, industrial_robot_model, control_system_variable, other]
+  max_gleanings: 1
+
+summarize_descriptions:
+  completion_model_id: default_completion_model
+  prompt: "prompts/summarize_descriptions.txt"
+  max_length: 500
+
+extract_graph_nlp:
+  text_analyzer:
+    extractor_type: regex_english
+
+cluster_graph:
+  max_cluster_size: 10
+
+extract_claims:
+  enabled: false
+  completion_model_id: default_completion_model
+  prompt: "prompts/extract_claims.txt"
+  description: "Any claims or facts that could be relevant to information discovery."
+  max_gleanings: 1
+
+community_reports:
+  completion_model_id: default_completion_model
+  graph_prompt: "prompts/community_report_graph.txt"
+  text_prompt: "prompts/community_report_text.txt"
+  max_length: 2000
+  max_input_length: 8000
+
+## embed_graph 和 umap 已在 v3.0.5 中移除，不再需要
+
+snapshots:
+  graphml: false
+  embeddings: false
+  raw_graph: true
+
+### Query settings ###
+
+local_search:
+  completion_model_id: default_completion_model
+  embedding_model_id: default_embedding_model
+  prompt: "prompts/local_search_system_prompt.txt"
+  text_unit_prop: 0.6
+  community_prop: 0.0                    # 如果你没跑 community_reports，保持 0.0
+  conversation_history_max_turns: 0
+  top_k_entities: 10                     # 小模型场景下保持更聚焦的召回
+  top_k_relationships: 10
+  max_context_tokens: 3000
+  # PCST 子图检索配置 (G-Retriever)
+  use_pcst: false                        # 先关闭以提升稳定性与速度
+  pcst_top_k_nodes: 10                   # PCST 中获得奖励的 top-k 节点数
+  pcst_top_k_edges: 10                   # PCST 中获得奖励的 top-k 边数
+  pcst_cost_per_edge: 0.5               # 每条边的成本，越大子图越小
+
+global_search:
+  completion_model_id: default_completion_model
+  map_prompt: "prompts/global_search_map_system_prompt.txt"
+  reduce_prompt: "prompts/global_search_reduce_system_prompt.txt"
+  knowledge_prompt: "prompts/global_search_knowledge_system_prompt.txt"
+
+drift_search:
+  completion_model_id: default_completion_model
+  embedding_model_id: default_embedding_model
+  prompt: "prompts/drift_search_system_prompt.txt"
+  reduce_prompt: "prompts/drift_search_reduce_prompt.txt"
+
+basic_search:
+  completion_model_id: default_completion_model
+  embedding_model_id: default_embedding_model
+  prompt: "prompts/basic_search_system_prompt.txt"

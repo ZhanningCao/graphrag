@@ -1,0 +1,31 @@
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# IDE files
+.idea/
+.vscode/
+
+# Generated batch outputs and temp logs
+trace_batch*/
+*_result.txt
+test_run*.log
+
+# GraphRAG generated data (rebuildable)
+graph_database/output/
+graph_database/cache/
+graph_database/logs/
+
+# OS files
+.DS_Store
+Thumbs.db
