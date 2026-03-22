@@ -76,7 +76,7 @@ reporting:
 
 vector_store:
   type: lancedb
-  db_uri: "d:\\SEU\\SRTP项目\\graphrag\\graph_database\\output\\lancedb"
+  db_uri: "d:\\SEU\\SRTP\\graphrag\\graphrag\\graph_database\\output\\lancedb"
   vector_size: 2560
   index_schema:
     text_unit_text:
@@ -158,7 +158,7 @@ local_search:
   top_k_relationships: 10
   max_context_tokens: 3000
   # PCST 子图检索配置 (G-Retriever)
-  use_pcst: false                        # 先关闭以提升稳定性与速度
+  use_pcst: true                         # 启用 PCST 子图检索
   pcst_top_k_nodes: 10                   # PCST 中获得奖励的 top-k 节点数
   pcst_top_k_edges: 10                   # PCST 中获得奖励的 top-k 边数
   pcst_cost_per_edge: 0.5               # 每条边的成本，越大子图越小

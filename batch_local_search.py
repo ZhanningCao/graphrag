@@ -261,6 +261,7 @@ def main():
                 "prompt_tokens_response": int(prompt_cats.get("response", 0)),
                 "prompt_tokens_build_context": int(prompt_cats.get("build_context", 0)),
                 "context_chars": len(context_text),
+                "context_text": context_text,
             }
 
             # 实时追加到单文件，避免中断时丢失进度
